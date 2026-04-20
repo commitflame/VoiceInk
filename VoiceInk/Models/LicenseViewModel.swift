@@ -3,6 +3,9 @@ import AppKit
 
 @MainActor
 class LicenseViewModel: ObservableObject {
+    /// Configuration: Set to `true` to bypass license checks for development/testing
+    static let bypassLicense = true
+
     enum LicenseState: Equatable {
         case trial(daysRemaining: Int)
         case trialExpired
@@ -33,6 +36,12 @@ class LicenseViewModel: ObservableObject {
     }
     
     private func loadLicenseState() {
+        // Check if license check is bypassed via configuration
+        if Self.bypassLicense {
+            licenseState = .licensed
+            return
+        }
+
         // Check for existing license key
         if let licenseKey = userDefaults.licenseKey {
             self.licenseKey = licenseKey
